@@ -1,7 +1,10 @@
 {
     "name": "Mazi",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GameAnalyticsAssembly",
+        "IronSourceAssembly"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
