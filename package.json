@@ -1,0 +1,12 @@
+{
+  "name": "com.mazi.core",
+  "displayName": "Mazi Utilities Package",
+  "version": "1.0.4",
+  "author": "Baris Tasin",
+  "unity": "2020.3",
+  "repository": 
+	{
+  "type": "git",
+  "url": "https://github.com/baristasin/com.mazi.core.git"
+	}
+}
