@@ -3,7 +3,7 @@
     "rootNamespace": "",
     "references": [
         "GameAnalyticsAssembly",
-        "IronSourceAssembly"
+        "Unity.LevelPlay"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
