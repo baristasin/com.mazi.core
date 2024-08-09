@@ -8,64 +8,69 @@ namespace Mazi.Mediations
     public class IronSourceMediation : MonoBehaviour, IMediationType
     {
         public event Action<bool> OnRewardedVideoDismissed;
+        public event Action<bool> OnRewardedLoadProcessCompleted;
+        public event Action<bool> OnInterstitialLoadProcessCompleted;
+        public event Action<bool> OnBannerLoadProcessCompleted;
 
         public void Initialize()
         {
 
-            IronSource.Agent.init("135a6c241", IronSourceAdUnits.REWARDED_VIDEO, IronSourceAdUnits.INTERSTITIAL, IronSourceAdUnits.BANNER);
-
-            //Add AdInfo Rewarded Video Events
-            IronSourceRewardedVideoEvents.onAdOpenedEvent += RewardedVideoOnAdOpenedEvent;
-            IronSourceRewardedVideoEvents.onAdClosedEvent += RewardedVideoOnAdClosedEvent;
-            IronSourceRewardedVideoEvents.onAdAvailableEvent += RewardedVideoOnAdAvailable;
-            IronSourceRewardedVideoEvents.onAdUnavailableEvent += RewardedVideoOnAdUnavailable;
+            IronSource.Agent.init("13212dda5", IronSourceAdUnits.REWARDED_VIDEO, IronSourceAdUnits.INTERSTITIAL, IronSourceAdUnits.BANNER);
+                        
             IronSourceRewardedVideoEvents.onAdShowFailedEvent += RewardedVideoOnAdShowFailedEvent;
             IronSourceRewardedVideoEvents.onAdRewardedEvent += RewardedVideoOnAdRewardedEvent;
-            IronSourceRewardedVideoEvents.onAdClickedEvent += RewardedVideoOnAdClickedEvent;
 
+            IronSourceRewardedVideoEvents.onAdReadyEvent += RewardedVideoReadyForShow;
+            IronSourceRewardedVideoEvents.onAdLoadFailedEvent += RewardedVideoFailedToLoad;
+
+            IronSourceBannerEvents.onAdLoadedEvent += BannerReadyForShow;
+            IronSourceBannerEvents.onAdLoadFailedEvent += BannerFailedToLoad;
+
+            IronSourceInterstitialEvents.onAdReadyEvent += InterstitialReadyForShow;
+            IronSourceInterstitialEvents.onAdLoadFailedEvent += InterstitialFailedToLoad;
 
             IronSource.Agent.validateIntegration();      
         }
 
+        private void InterstitialReadyForShow(IronSourceAdInfo obj)
+        {
+            OnInterstitialLoadProcessCompleted?.Invoke(true);
+        }
 
-        /************* RewardedVideo AdInfo Delegates *************/
-        // Indicates that there’s an available ad.
-        // The adInfo object includes information about the ad that was loaded successfully
-        // This replaces the RewardedVideoAvailabilityChangedEvent(true) event
-        void RewardedVideoOnAdAvailable(IronSourceAdInfo adInfo)
+        private void InterstitialFailedToLoad(IronSourceError obj)
         {
+            OnInterstitialLoadProcessCompleted?.Invoke(false);
         }
-        // Indicates that no ads are available to be displayed
-        // This replaces the RewardedVideoAvailabilityChangedEvent(false) event
-        void RewardedVideoOnAdUnavailable()
+      
+        private void BannerReadyForShow(IronSourceAdInfo obj)
         {
+            OnBannerLoadProcessCompleted?.Invoke(true);
         }
-        // The Rewarded Video ad view has opened. Your activity will loose focus.
-        void RewardedVideoOnAdOpenedEvent(IronSourceAdInfo adInfo)
+
+        private void BannerFailedToLoad(IronSourceError obj)
         {
+            OnBannerLoadProcessCompleted?.Invoke(false);
         }
-        // The Rewarded Video ad view is about to be closed. Your activity will regain its focus.
-        void RewardedVideoOnAdClosedEvent(IronSourceAdInfo adInfo)
+
+        private void RewardedVideoReadyForShow(IronSourceAdInfo obj)
         {
+            OnRewardedLoadProcessCompleted?.Invoke(true);
         }
-        // The user completed to watch the video, and should be rewarded.
-        // The placement parameter will include the reward data.
-        // When using server-to-server callbacks, you may ignore this event and wait for the ironSource server callback.
+
+        private void RewardedVideoFailedToLoad(IronSourceError obj)
+        {
+            OnRewardedLoadProcessCompleted?.Invoke(false);
+        }
+
         void RewardedVideoOnAdRewardedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
         {
             OnRewardedVideoDismissed?.Invoke(true);
         }
-        // The rewarded video ad was failed to show.
+
         void RewardedVideoOnAdShowFailedEvent(IronSourceError error, IronSourceAdInfo adInfo)
         {
             OnRewardedVideoDismissed?.Invoke(false);
-        }
-        // Invoked when the video ad was clicked.
-        // This callback is not supported by all networks, and we recommend using it only if
-        // it’s supported by all networks you included in your build.
-        void RewardedVideoOnAdClickedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
-        {
-        }
+        }               
 
         public void LoadRewarded()
         {
@@ -84,7 +89,32 @@ namespace Mazi.Mediations
 
         public void ShowInterstitial()
         {
-            IronSource.Agent.showInterstitial("DefaultInterstitial");
+            IronSource.Agent.showInterstitial();
+        }
+
+        public void LoadBanner()
+        {
+            IronSource.Agent.loadBanner(IronSourceBannerSize.BANNER, IronSourceBannerPosition.BOTTOM);
+        }
+
+        public void ShowBanner()
+        {
+            IronSource.Agent.displayBanner();
+        }
+
+        private void OnDestroy()
+        {
+            IronSourceRewardedVideoEvents.onAdShowFailedEvent -= RewardedVideoOnAdShowFailedEvent;
+            IronSourceRewardedVideoEvents.onAdRewardedEvent -= RewardedVideoOnAdRewardedEvent;
+
+            IronSourceRewardedVideoEvents.onAdReadyEvent -= RewardedVideoReadyForShow;
+            IronSourceRewardedVideoEvents.onAdLoadFailedEvent -= RewardedVideoFailedToLoad;
+
+            IronSourceBannerEvents.onAdLoadedEvent -= BannerReadyForShow;
+            IronSourceBannerEvents.onAdLoadFailedEvent -= BannerFailedToLoad;
+
+            IronSourceInterstitialEvents.onAdReadyEvent -= InterstitialReadyForShow;
+            IronSourceInterstitialEvents.onAdLoadFailedEvent -= InterstitialFailedToLoad;
         }
     }
 }

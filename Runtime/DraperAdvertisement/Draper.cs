@@ -19,6 +19,11 @@ namespace Mazi.DraperAdvertisement
         [SerializeField] private bool _isBannerActive;
         [SerializeField] private bool _isRewardedActive;
 
+        private bool _isInterstitialReadyToShow;
+        private bool _isRewardedReadyToShow;
+        private bool _isBannerReadyToShow;
+
+        private bool _isNoAdsActive;
         private Action _rewardedCallback;
 
         private void Awake()
@@ -26,6 +31,10 @@ namespace Mazi.DraperAdvertisement
             _mediationType = _ironSourceMediation;
 
             _ironSourceMediation.Initialize();
+
+            _mediationType.OnInterstitialLoadProcessCompleted += InterstitialLoadProcessCompleted;
+            _mediationType.OnRewardedLoadProcessCompleted += RewardedLoadProcessCompleted;
+            _mediationType.OnBannerLoadProcessCompleted += BannerLoadProcessCompleted;
 
             #region Singleton
             if (Instance == null)
@@ -40,27 +49,53 @@ namespace Mazi.DraperAdvertisement
             #endregion
 
             #region LoadingAds
-            if (_isInterstitialActive)
+            if (_isInterstitialActive && !_isNoAdsActive)
             {
-                LoadInterstitial();
+                LoadInterstitial();                
             }
             if (_isRewardedActive)
             {
                 LoadRewarded();
-            _mediationType.OnRewardedVideoDismissed += RewardedVideoDismissed;
+                _mediationType.OnRewardedVideoDismissed += RewardedVideoDismissed;
             }
-            if (_isBannerActive)
+            if (_isBannerActive && !_isNoAdsActive)
             {
                 LoadBanner();
             }
             #endregion
         }
 
-        private void OnDestroy()
+        private void BannerLoadProcessCompleted(bool success)
         {
-            _mediationType.OnRewardedVideoDismissed -= RewardedVideoDismissed;
+            _isBannerReadyToShow = success;
+            if (_isBannerReadyToShow)
+            {
+                ShowBanner();
+            }
+            else
+            {
+                LoadBanner();
+            }
         }
 
+        private void RewardedLoadProcessCompleted(bool success)
+        {
+            _isRewardedReadyToShow = success;
+            if (!_isRewardedReadyToShow)
+            {
+                LoadRewarded();
+            }
+        }
+
+        private void InterstitialLoadProcessCompleted(bool success)
+        {
+            _isInterstitialReadyToShow = success;
+            if (!_isRewardedReadyToShow)
+            {
+                LoadInterstitial();
+            }
+        }
+       
         private void RewardedVideoDismissed(bool isSuccess)
         {
             LoadRewarded();
@@ -75,33 +110,59 @@ namespace Mazi.DraperAdvertisement
             }
         }
 
-        public void LoadInterstitial()
+        private void LoadInterstitial()
         {
             _mediationType.LoadInterstitial();
-            //Request Ads
+            Debug.Log("Inters Request");
         }
-        public void LoadBanner()
+
+        private void LoadBanner()
         {
-            //Request Ads
+            _mediationType.LoadBanner();
+            Debug.Log("Banner Request");
         }
-        public void LoadRewarded()
+
+        private void LoadRewarded()
         {
             _mediationType.LoadRewarded();
-            //Request Ads
+            Debug.Log("Rewarded Request");
+        }
+
+        private void ShowBanner()
+        {            
+            _mediationType.ShowBanner();
+            LoadBanner();
         }
 
         public void ShowInterstitial()
         {
-            _mediationType.ShowInterstitial();
-            LoadInterstitial();
+            if (_isInterstitialReadyToShow)
+            {
+                _mediationType.ShowInterstitial();
+                _isInterstitialReadyToShow = false;
+
+                LoadInterstitial();
+            }
         }
-        public void ShowBanner()
-        {
-        }
+
         public void ShowRewarded(Action rewardedCallback)
         {
-            _rewardedCallback = rewardedCallback;
-            _mediationType.ShowRewarded();
+            if (_isRewardedReadyToShow)
+            {
+                _mediationType.ShowRewarded();
+                _rewardedCallback = rewardedCallback;
+                _isRewardedReadyToShow = false;
+
+                LoadRewarded();
+            }
+        }
+
+        private void OnDestroy()
+        {
+            _mediationType.OnRewardedVideoDismissed -= RewardedVideoDismissed;
+            _mediationType.OnInterstitialLoadProcessCompleted -= InterstitialLoadProcessCompleted;
+            _mediationType.OnRewardedLoadProcessCompleted -= RewardedLoadProcessCompleted;
+            _mediationType.OnBannerLoadProcessCompleted -= BannerLoadProcessCompleted;
         }
     }
 }

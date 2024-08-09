@@ -49,11 +49,11 @@ namespace Mazi.GadgetAnalytics
             GameAnalytics.Initialize();
         }
 
-        public void SendLevelEndEvent(bool isSuccess)
+        public void SendLevelEndEvent(bool isSuccess, int levelId)
         {
             if (isSuccess)
             {
-                TrackEvent("LevelCompleted", 0);
+                TrackEvent("LevelCompleted", levelId);
             }
             else
             {
