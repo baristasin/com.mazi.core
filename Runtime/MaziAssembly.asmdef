@@ -3,7 +3,11 @@
     "rootNamespace": "",
     "references": [
         "GameAnalyticsAssembly",
-        "Unity.LevelPlay"
+        "Unity.LevelPlay",
+        "UnityEngine.Purchasing",
+        "UnityEditor.Purchasing",
+        "Purchasing.Common",
+        "UnityEngine.Purchasing.Stores"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
