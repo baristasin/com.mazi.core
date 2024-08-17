@@ -1,7 +1,10 @@
 using System;
+using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.Purchasing.Extension;
+using Unity.Services.Core;
+using Unity.Services.Core.Environments;
 
 namespace Mazi.BuffetIAPurchasing
 {
@@ -11,9 +14,8 @@ namespace Mazi.BuffetIAPurchasing
 
         private IStoreController m_StoreController;
 
-        private void Awake()
+        async void Awake()
         {
-            InitializeIAPItems();
             #region Singleton
             if (Instance == null)
             {
@@ -25,6 +27,18 @@ namespace Mazi.BuffetIAPurchasing
                 Destroy(gameObject);
             }
             #endregion
+
+            try
+            {
+                await UnityServices.InitializeAsync();
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                Debug.Log($"Sign in anonymously succeeded! PlayerID: {AuthenticationService.Instance.PlayerId}");
+                InitializeIAPItems();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }            
         }
 
         public void InitializeIAPItems()

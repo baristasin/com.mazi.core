@@ -4,7 +4,7 @@ using Mazi.BuffetIAPurchasing;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "BuffetIAP", menuName = "ScriptableObjects/BuffetIAPItemContainer", order = 1)]
+[CreateAssetMenu(fileName = "BuffetIAPItemContainer", menuName = "ScriptableObjects/BuffetIAPItemContainer", order = 1)]
 public class BuffetIAPItemContainer : ScriptableObject
 {
     public List<BuffetIAPItem> BuffetIAPItems;
