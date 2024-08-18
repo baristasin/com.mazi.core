@@ -1,5 +1,5 @@
 ﻿using Facebook.Unity;
-using GameAnalyticsSDK;
+//using GameAnalyticsSDK;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -46,7 +46,7 @@ namespace Mazi.GadgetAnalytics
 
         private void GameAnalytics_Initialize()
         {
-            GameAnalytics.Initialize();
+            //GameAnalytics.Initialize();
         }
 
         public void SendLevelEndEvent(bool isSuccess, int levelId)
@@ -65,11 +65,11 @@ namespace Mazi.GadgetAnalytics
         {
             if (eventValue == 0f)
             {
-                GameAnalytics.NewDesignEvent(eventName);
+                //GameAnalytics.NewDesignEvent(eventName);
             }
             else
             {
-                GameAnalytics.NewDesignEvent(eventName, eventValue);
+                //GameAnalytics.NewDesignEvent(eventName, eventValue);
             }
         }
     }
