@@ -1,4 +1,4 @@
-﻿using Facebook.Unity;
+﻿//using Facebook.Unity;
 //using GameAnalyticsSDK;
 using System;
 using System.Collections;
@@ -31,17 +31,17 @@ namespace Mazi.GadgetAnalytics
 
         private void Facebook_Initialize()
         {
-            if (FB.IsInitialized)
-            {
-                FB.ActivateApp();
-            }
-            else
-            {
-                //Handle FB.Init
-                FB.Init(() => {
-                    FB.ActivateApp();
-                });
-            }
+            //if (FB.IsInitialized)
+            //{
+            //    FB.ActivateApp();
+            //}
+            //else
+            //{
+            //    //Handle FB.Init
+            //    FB.Init(() => {
+            //        FB.ActivateApp();
+            //    });
+            //}
         }
 
         private void GameAnalytics_Initialize()
