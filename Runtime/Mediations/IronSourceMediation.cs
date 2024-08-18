@@ -12,10 +12,13 @@ namespace Mazi.Mediations
         public event Action<bool> OnInterstitialLoadProcessCompleted;
         public event Action<bool> OnBannerLoadProcessCompleted;
 
+        private IronSourceConnectionContainer _ironSourceConnectionContainer;
+
         public void Initialize()
         {
+            _ironSourceConnectionContainer = Resources.Load<IronSourceConnectionContainer>("MediationContainers/IronSourceConnectionContainer");
 
-            IronSource.Agent.init("13212dda5", IronSourceAdUnits.REWARDED_VIDEO, IronSourceAdUnits.INTERSTITIAL, IronSourceAdUnits.BANNER);
+            IronSource.Agent.init(_ironSourceConnectionContainer.IronSourceId, IronSourceAdUnits.REWARDED_VIDEO, IronSourceAdUnits.INTERSTITIAL, IronSourceAdUnits.BANNER);
                         
             IronSourceRewardedVideoEvents.onAdShowFailedEvent += RewardedVideoOnAdShowFailedEvent;
             IronSourceRewardedVideoEvents.onAdRewardedEvent += RewardedVideoOnAdRewardedEvent;
