@@ -1,4 +1,5 @@
 using Assets.Mazi.Interfaces;
+using Mazi.BuffetIAPurchasing;
 using Mazi.Mediations;
 using System;
 using System.Collections;
@@ -36,6 +37,8 @@ namespace Mazi.DraperAdvertisement
             _mediationType.OnRewardedLoadProcessCompleted += RewardedLoadProcessCompleted;
             _mediationType.OnBannerLoadProcessCompleted += BannerLoadProcessCompleted;
 
+            Buffet.Instance.OnNoAdsBought += NoAdsBought;
+
             #region Singleton
             if (Instance == null)
             {
@@ -51,7 +54,7 @@ namespace Mazi.DraperAdvertisement
             #region LoadingAds
             if (_isInterstitialActive && !_isNoAdsActive)
             {
-                LoadInterstitial();                
+                LoadInterstitial();
             }
             if (_isRewardedActive)
             {
@@ -63,6 +66,11 @@ namespace Mazi.DraperAdvertisement
                 LoadBanner();
             }
             #endregion
+        }
+
+        private void NoAdsBought()
+        {
+
         }
 
         private void BannerLoadProcessCompleted(bool success)
@@ -95,7 +103,7 @@ namespace Mazi.DraperAdvertisement
                 LoadInterstitial();
             }
         }
-       
+
         private void RewardedVideoDismissed(bool isSuccess)
         {
             LoadRewarded();
@@ -118,8 +126,11 @@ namespace Mazi.DraperAdvertisement
 
         private void LoadBanner()
         {
-            _mediationType.LoadBanner();
-            Debug.Log("Banner Request");
+            if (!Buffet.Instance.IsNoAdsBought)
+            {
+                _mediationType.LoadBanner();
+                Debug.Log("Banner Request");
+            }
         }
 
         private void LoadRewarded()
@@ -129,14 +140,14 @@ namespace Mazi.DraperAdvertisement
         }
 
         private void ShowBanner()
-        {            
+        {
             _mediationType.ShowBanner();
             LoadBanner();
         }
 
         public void ShowInterstitial()
         {
-            if (_isInterstitialReadyToShow)
+            if (_isInterstitialReadyToShow && !Buffet.Instance.IsNoAdsBought)
             {
                 _mediationType.ShowInterstitial();
                 _isInterstitialReadyToShow = false;

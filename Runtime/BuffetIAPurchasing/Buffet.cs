@@ -5,6 +5,7 @@ using UnityEngine.Purchasing;
 using UnityEngine.Purchasing.Extension;
 using Unity.Services.Core;
 using Unity.Services.Core.Environments;
+using Mazi.UserDataContainer;
 
 namespace Mazi.BuffetIAPurchasing
 {
@@ -12,7 +13,15 @@ namespace Mazi.BuffetIAPurchasing
     {
         public static Buffet Instance;
 
+        public event Action OnNoAdsBought;
+
+        public bool IsNoAdsBought => _isNoAdsBought;
+
         private IStoreController m_StoreController;
+
+        private bool _isNoAdsBought;
+
+        private BuffetIAPItemContainer _buffetIAPItemContainer;
 
         async void Awake()
         {
@@ -38,18 +47,20 @@ namespace Mazi.BuffetIAPurchasing
             catch (Exception e)
             {
                 Debug.LogException(e);
-            }            
+            }
+
+            _isNoAdsBought = UserData.IsNoAdsBought;
         }
 
         public void InitializeIAPItems()
         {
-            var buffetIAPItems = Resources.Load<BuffetIAPItemContainer>("BuffetIAP/BuffetIAPItemContainer");
+            _buffetIAPItemContainer = Resources.Load<BuffetIAPItemContainer>("BuffetIAP/BuffetIAPItemContainer");
 
             var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());            
 
-            for (int i = 0; i < buffetIAPItems.BuffetIAPItems.Count; i++)
+            for (int i = 0; i < _buffetIAPItemContainer.BuffetIAPItems.Count; i++)
             {
-                builder.AddProduct(buffetIAPItems.BuffetIAPItems[i].ItemId, buffetIAPItems.BuffetIAPItems[i].ProductType);
+                builder.AddProduct(_buffetIAPItemContainer.BuffetIAPItems[i].ItemId, _buffetIAPItemContainer.BuffetIAPItems[i].ProductType);
             }
 
             UnityPurchasing.Initialize(this, builder);
@@ -89,9 +100,11 @@ namespace Mazi.BuffetIAPurchasing
             var product = purchaseEvent.purchasedProduct;
 
             //Add the purchased product to the players inventory
-            if (product.definition.id == "com.mycompany.noads") // TODO
+            if (product.definition.id == _buffetIAPItemContainer.BuffetIAPItems.Find(x => x.ItemSpecialty == ItemSpecialty.NoAds).ItemId) // TODO
             {
-                // Add NoAds
+                _isNoAdsBought = true;
+                UserData.IsNoAdsBought = true;
+                OnNoAdsBought?.Invoke();
             }
 
             Debug.Log($"Purchase Complete - Product: {product.definition.id}");

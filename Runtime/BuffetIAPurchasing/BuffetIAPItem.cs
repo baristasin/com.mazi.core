@@ -5,11 +5,18 @@ using UnityEngine.Purchasing.Extension;
 
 namespace Mazi.BuffetIAPurchasing
 {
+    public enum ItemSpecialty
+    {
+        NonSpecial,
+        NoAds
+    }
+
     [Serializable]
     public class BuffetIAPItem
     {
         public ProductType ProductType;
-        public string ItemId;
+        public ItemSpecialty ItemSpecialty;
+        public string ItemId;        
         public int Quantity;
     }
 }
